@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AlgorithmSelector from '../components/AlgorithmSelector';
 import MemoryBlockCard from '../components/MemoryBlockCard';
 import ProcessCard from '../components/ProcessCard';
@@ -9,6 +9,7 @@ import BlocksTable from '../components/BlocksTable';
 import ProcessesTable from '../components/ProcessesTable';
 import { firstFit, bestFit, worstFit } from '../utils/memoryAllocationAlgorithms';
 import { toast } from 'sonner';
+import gsap from 'gsap';
 
 const Index = () => {
   const [memoryBlocks, setMemoryBlocks] = useState([]);
@@ -18,6 +19,19 @@ const Index = () => {
   const [blockCount, setBlockCount] = useState(1);
   const [processCount, setProcessCount] = useState(1);
   const [showResults, setShowResults] = useState(false);
+  
+  const cardsRef = useRef(null);
+  
+  useEffect(() => {
+    // Add GSAP animation for cards when component mounts
+    if (cardsRef.current) {
+      gsap.fromTo(
+        cardsRef.current.children,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, stagger: 0.1, duration: 0.6, ease: "power2.out" }
+      );
+    }
+  }, []);
 
   const handleAddBlock = (block) => {
     setMemoryBlocks([...memoryBlocks, block]);
@@ -89,11 +103,15 @@ const Index = () => {
     setShowResults(true);
     toast.success("Memory allocation complete");
     
-    // Scroll to results
+    // Scroll to results with GSAP animation
     setTimeout(() => {
       const resultsSection = document.getElementById('results-section');
       if (resultsSection) {
-        resultsSection.scrollIntoView({ behavior: 'smooth' });
+        gsap.to(window, {
+          duration: 1,
+          scrollTo: { y: resultsSection, offsetY: 50 },
+          ease: "power2.inOut"
+        });
       }
     }, 100);
   };
@@ -110,19 +128,26 @@ const Index = () => {
       </header>
 
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <AlgorithmSelector 
-            selectedAlgorithm={selectedAlgorithm} 
-            onSelectAlgorithm={setSelectedAlgorithm} 
-          />
-          <MemoryBlockCard 
-            onAddBlock={handleAddBlock} 
-            blockCount={blockCount} 
-          />
-          <ProcessCard 
-            onAddProcess={handleAddProcess} 
-            processCount={processCount}
-          />
+        <div ref={cardsRef} className="flex flex-col md:flex-row flex-wrap justify-center gap-6 mb-8">
+          {/* Cards in the requested order */}
+          <div className="w-full md:w-auto flex-1 min-w-[300px]">
+            <MemoryBlockCard 
+              onAddBlock={handleAddBlock} 
+              blockCount={blockCount} 
+            />
+          </div>
+          <div className="w-full md:w-auto flex-1 min-w-[300px]">
+            <ProcessCard 
+              onAddProcess={handleAddProcess} 
+              processCount={processCount}
+            />
+          </div>
+          <div className="w-full md:w-auto flex-1 min-w-[300px]">
+            <AlgorithmSelector 
+              selectedAlgorithm={selectedAlgorithm} 
+              onSelectAlgorithm={setSelectedAlgorithm} 
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
