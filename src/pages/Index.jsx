@@ -8,7 +8,7 @@ import ResultsTable from '../components/ResultsTable';
 import BlocksTable from '../components/BlocksTable';
 import ProcessesTable from '../components/ProcessesTable';
 import { firstFit, bestFit, worstFit } from '../utils/memoryAllocationAlgorithms';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 const Index = () => {
   const [memoryBlocks, setMemoryBlocks] = useState([]);
